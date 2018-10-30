@@ -66,7 +66,7 @@ The following standard features are implemented.
 * Basic authentication according to the XMLHttpRequest specification
 * request and response header management
 * `send()` accepts the following data types: String, ArrayBufferView,
-  ArrayBuffer (deprecated in the standard)
+  ArrayBuffer (deprecated in the standard), FormData
 * `responseType` values: `text`, `json`, `arraybuffer`
 * `readystatechange` and download progress events
 * `overrideMimeType()`
@@ -83,7 +83,6 @@ The following node.js extensions are implemented.
 
 The following standard features are not implemented.
 
-* FormData
 * Blob
 * `file://` URIs
 * `data:` URIs

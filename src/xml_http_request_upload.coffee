@@ -1,3 +1,5 @@
+FormData = require('form-data')
+
 # @see http://xhr.spec.whatwg.org/#interface-xmlhttprequest
 class XMLHttpRequestUpload extends XMLHttpRequestEventTarget
   # @private
@@ -22,11 +24,12 @@ class XMLHttpRequestUpload extends XMLHttpRequestEventTarget
   # @private
   # @param {?String, ?Buffer, ?ArrayBufferView} data the argument passed to
   #   XMLHttpRequest#send()
+  # @param {Function} cb callback function when data is processed
   # @return {undefined} undefined
   # @see step 4 of http://www.w3.org/TR/XMLHttpRequest/#the-send()-method
-  _setData: (data) ->
+  _setData: (data, cb) ->
     if typeof data is 'undefined' or data is null
-      return
+      return cb()
 
     if typeof data is 'string'
       # DOMString
@@ -49,13 +52,24 @@ class XMLHttpRequestUpload extends XMLHttpRequestEventTarget
       view = new Uint8Array data.buffer
       body[i] = view[i + offset] for i in [0...data.byteLength]
       @_body = body
+    else if data instanceof FormData
+      body = ''
+      @_contentType = data.getHeaders()['content-type']
+      data.on('data', (data) -> body += data.toString())
+      that = this
+      data.on('end', () ->
+        that._body = body
+        cb()
+      )
+      data.resume()
+      return
     else
       # NOTE: diverging from the XHR specification of coercing everything else
       #       to Strings via toString() because that behavior masks bugs and is
       #       rarely useful
       throw new Error "Unsupported send() data #{data}"
 
-    undefined
+    cb()
 
   # Updates the HTTP headers right before the request is sent.
   #

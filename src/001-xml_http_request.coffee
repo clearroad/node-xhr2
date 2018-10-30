@@ -437,10 +437,10 @@ class XMLHttpRequest extends XMLHttpRequestEventTarget
 
     # NOTE: this is called before finalizeHeaders so that the uploader can
     #       figure out Content-Length and Content-Type.
-    @upload._setData data
-    @_finalizeHeaders()
-
-    @_sendHxxpRequest()
+    that = this
+    @upload._setData data, () ->
+      that._finalizeHeaders()
+      that._sendHxxpRequest()
     undefined
 
   # Sets up and fires off a HTTP/HTTPS request using the node.js API.
@@ -780,3 +780,4 @@ module.exports = XMLHttpRequest
 # following usage pattern:
 #     var XMLHttpRequest = require('xhr-library-name').XMLHttpRequest
 XMLHttpRequest.XMLHttpRequest = XMLHttpRequest
+XMLHttpRequest.FormData = require('form-data')
